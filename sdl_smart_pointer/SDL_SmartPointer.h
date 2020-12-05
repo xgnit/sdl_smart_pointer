@@ -1,3 +1,36 @@
+/*
+
+The order of the APIs are the same as listed in: https://wiki.libsdl.org/CategoryAPI
+
+For each API function an unique ptr and a shared ptr version should be available, unless it's not possible, e.g.
+void* can only be written in shared ptr.
+
+All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer) or "SP_U"
+(unique version) or "SP_S" (shared version)
+
+License
+
+  SDL Smart Pointer 
+  Copyright (C) 1997-2020 Ting Fu <futinn@gmail.com>
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+	 misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+*/
+
 #pragma once
 
 
@@ -12,24 +45,62 @@
 
 namespace SDL_SmartPointer
 {
-	struct sdl_deleter
+	struct SDL_Deleter
 	{
 		void operator()(SDL_Window *p) const { SDL_DestroyWindow(p); }
 		void operator()(SDL_Renderer *p) const { SDL_DestroyRenderer(p); }
 		void operator()(SDL_Texture *p) const { SDL_DestroyTexture(p); }
 	};
 
-	using std::unique_ptr;
-	using SDL_SmartWindow = unique_ptr<SDL_Window, sdl_deleter>;
-	using SDL_SmartRenderer = unique_ptr<SDL_Renderer, sdl_deleter>;
-	using SDL_SmartTexture = unique_ptr<SDL_Texture, sdl_deleter>;
 
-	SDL_SmartWindow
-		create_window(char const *title, int x, int y, int w, int h, Uint32 flags)
+
+
+	using SP_SDL_Window = std::unique_ptr<SDL_Window, SDL_Deleter>;
+	using SP_SDL_Renderer = std::unique_ptr<SDL_Renderer, SDL_Deleter>;
+	using SP_SDL_Texture = std::unique_ptr<SDL_Texture, SDL_Deleter>;
+
+#define SHARED_VOID_2_VOID_PTR(param) (static_cast<void *>(&param))
+
+	
+	void SP_SDL_AddEventWatch(SDL_EventFilter filter, std::shared_ptr<void> userdata)
 	{
-		return unique_ptr<SDL_Window, sdl_deleter>(
+		SDL_AddEventWatch(filter, SHARED_VOID_2_VOID_PTR(userdata));
+	}
+
+	void SP_SDL_AddHintCallback(const std::string& name, SDL_HintCallback callback, std::shared_ptr<void> userdata)
+	{
+		SDL_AddHintCallback(name.c_str(), callback, SHARED_VOID_2_VOID_PTR(userdata));
+	}
+
+	SDL_TimerID SP_SDL_AddTimer(Uint32 interval, SDL_TimerCallback callback, std::shared_ptr<void> param)
+	{
+		return SDL_AddTimer(interval, callback, SHARED_VOID_2_VOID_PTR(param));
+	}
+
+	std::unique_ptr<SDL_PixelFormat> SP_U_SDL_AllocFormat(Uint32 pixel_format)
+	{
+		return std::unique_ptr<SDL_PixelFormat>(SDL_AllocFormat(pixel_format));
+	}
+
+	std::shared_ptr<SDL_PixelFormat> SP_S_SDL_AllocFormat(Uint32 pixel_format)
+	{
+		return std::shared_ptr<SDL_PixelFormat>(SDL_AllocFormat(pixel_format));
+	}
+
+
+	/*
+	above are the functions that already wrap the raw pointer interfaces
+	
+	*/
+
+
+
+	SP_SDL_Window 
+	create_window(char const *title, int x, int y, int w, int h, Uint32 flags)
+	{
+		return std::unique_ptr<SDL_Window, SDL_Deleter>(
 			SDL_CreateWindow(title, x, y, w, h, flags),
-			sdl_deleter());
+			SDL_Deleter());
 	}
 	/*
 	SDL_SmartTexture
@@ -44,36 +115,36 @@ namespace SDL_SmartPointer
 	}
 	*/
 
-	SDL_SmartRenderer
-		create_renderer(unique_ptr<SDL_Window, sdl_deleter>&window)
+	SP_SDL_Renderer
+		create_renderer(std::unique_ptr<SDL_Window, SDL_Deleter>&window)
 	{
-		return SDL_SmartRenderer(
+		return SP_SDL_Renderer(
 			SDL_CreateRenderer(window.get(), -1, 0),
-			sdl_deleter());
+			SDL_Deleter());
 	}
 
 
-	void sdl_renderclear(SDL_SmartRenderer& renderer)
+	void sdl_renderclear(SP_SDL_Renderer& renderer)
 	{
 		SDL_RenderClear(renderer.get());
 	}
 
-	void sdl_rendercopy(SDL_SmartRenderer& renderer, SDL_SmartTexture& tex, unique_ptr<SDL_Rect>& src, unique_ptr<SDL_Rect>& dest)
+	void sdl_rendercopy(SP_SDL_Renderer& renderer, SP_SDL_Texture& tex, std::unique_ptr<SDL_Rect>& src, std::unique_ptr<SDL_Rect>& dest)
 	{
 		SDL_RenderCopy(renderer.get(), tex.get(), src.get(), dest.get());
 	}
 
-	void sdl_rendercopy(SDL_SmartRenderer& renderer, SDL_SmartTexture& tex, std::nullptr_t src, unique_ptr<SDL_Rect>& dest)
+	void sdl_rendercopy(SP_SDL_Renderer& renderer, SP_SDL_Texture& tex, std::nullptr_t src, std::unique_ptr<SDL_Rect>& dest)
 	{
 		SDL_RenderCopy(renderer.get(), tex.get(), NULL, dest.get());
 	}
 
-	void sdl_rendercopy(SDL_SmartRenderer& renderer, SDL_SmartTexture& tex, unique_ptr<SDL_Rect>& src, std::nullptr_t dest)
+	void sdl_rendercopy(SP_SDL_Renderer& renderer, SP_SDL_Texture& tex, std::unique_ptr<SDL_Rect>& src, std::nullptr_t dest)
 	{
 		SDL_RenderCopy(renderer.get(), tex.get(), src.get(), NULL);
 	}
 
-	void sdl_renderpresent(SDL_SmartRenderer& renderer)
+	void sdl_renderpresent(SP_SDL_Renderer& renderer)
 	{
 		SDL_RenderPresent(renderer.get());
 	}
