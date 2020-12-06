@@ -8,8 +8,9 @@ Manual:
 
 2. For each API function an unique ptr and a shared ptr version should be available, unless it's not possible, e.g. void* can only be written in shared ptr.
 
-3. All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer) or "SP_U" (unique version) or "SP_S" (shared version)
+3. All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer) or a possible suffix of "_U" (unique ptr) or "_S" (shared ptr). If no suffix, there is only the shared ptr version.
+
 Examples:
 SDL_AddEventWatch -> SP_SDL_AddEventWatch
-SDL_AllocFormat -> SP_U_SDL_AllocFormat
-SDL_AllocFormat -> SP_S_SDL_AllocFormat
+SDL_AllocFormat -> SP_SDL_AllocFormat_U
+SDL_AllocFormat -> SP_SDL_AllocFormat_S

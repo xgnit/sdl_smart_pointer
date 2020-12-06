@@ -5,8 +5,8 @@ The order of the APIs are the same as listed in: https://wiki.libsdl.org/Categor
 For each API function an unique ptr and a shared ptr version should be available, unless it's not possible, e.g.
 void* can only be written in shared ptr.
 
-All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer) or "SP_U"
-(unique version) or "SP_S" (shared version)
+All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer), and a 
+possible suffix of "_U" (unique ptr) or "_S" (shared ptr). If no suffix, there is only the shared ptr version.
 
 License
 
@@ -77,15 +77,37 @@ namespace SDL_SmartPointer
 		return SDL_AddTimer(interval, callback, SHARED_VOID_2_VOID_PTR(param));
 	}
 
-	std::unique_ptr<SDL_PixelFormat> SP_U_SDL_AllocFormat(Uint32 pixel_format)
+	std::unique_ptr<SDL_PixelFormat> SP_SDL_AllocFormat_U(Uint32 pixel_format)
 	{
 		return std::unique_ptr<SDL_PixelFormat>(SDL_AllocFormat(pixel_format));
 	}
 
-	std::shared_ptr<SDL_PixelFormat> SP_S_SDL_AllocFormat(Uint32 pixel_format)
+	std::shared_ptr<SDL_PixelFormat> SP_SDL_AllocFormat_S(Uint32 pixel_format)
 	{
 		return std::shared_ptr<SDL_PixelFormat>(SDL_AllocFormat(pixel_format));
 	}
+
+	std::shared_ptr<SDL_Palette> SP_SDL_AllocPalette_S(int ncolors)
+	{
+		return std::shared_ptr<SDL_Palette>(SDL_AllocPalette(ncolors));
+	}
+
+	std::unique_ptr<SDL_Palette> SP_SDL_AllocPalette_U(int ncolors)
+	{
+		return std::unique_ptr<SDL_Palette>(SDL_AllocPalette(ncolors));
+	}
+
+	std::shared_ptr<SDL_RWops> SP_SDL_AllocRW_S(void)
+	{
+		return std::shared_ptr<SDL_RWops> (SDL_AllocRW());
+	}
+
+	std::unique_ptr<SDL_RWops> SP_SDL_AllocRW_U(void)
+	{
+		return std::unique_ptr<SDL_RWops>(SDL_AllocRW());
+	}
+
+
 
 
 	/*
