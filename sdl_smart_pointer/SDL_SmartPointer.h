@@ -1,12 +1,13 @@
 /*
 
-The order of the APIs are the same as listed in: https://wiki.libsdl.org/CategoryAPI
+1. The order of the APIs are the same as listed in: https://wiki.libsdl.org/CategoryAPI
 
-For each API function an unique ptr and a shared ptr version should be available, unless it's not possible, e.g.
-void* can only be written in shared ptr.
+2. All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer)
 
-All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer), and a 
-possible suffix of "_U" (unique ptr) or "_S" (shared ptr). If no suffix, there is only the shared ptr version.
+3. If the original function returns a raw pointer, it will return a unique ptr in this lib
+
+4. If the original function receives raw pointer, its wrapper should be able to receive shared and unique ptr. 
+With only exception of  void* will be only wrapped with std::shared<void>
 
 License
 
@@ -77,32 +78,17 @@ namespace SDL_SmartPointer
 		return SDL_AddTimer(interval, callback, SHARED_VOID_2_VOID_PTR(param));
 	}
 
-	std::unique_ptr<SDL_PixelFormat> SP_SDL_AllocFormat_U(Uint32 pixel_format)
+	std::unique_ptr<SDL_PixelFormat> SP_SDL_AllocFormat(Uint32 pixel_format)
 	{
 		return std::unique_ptr<SDL_PixelFormat>(SDL_AllocFormat(pixel_format));
 	}
 
-	std::shared_ptr<SDL_PixelFormat> SP_SDL_AllocFormat_S(Uint32 pixel_format)
-	{
-		return std::shared_ptr<SDL_PixelFormat>(SDL_AllocFormat(pixel_format));
-	}
-
-	std::shared_ptr<SDL_Palette> SP_SDL_AllocPalette_S(int ncolors)
-	{
-		return std::shared_ptr<SDL_Palette>(SDL_AllocPalette(ncolors));
-	}
-
-	std::unique_ptr<SDL_Palette> SP_SDL_AllocPalette_U(int ncolors)
+	std::unique_ptr<SDL_Palette> SP_SDL_AllocPalette(int ncolors)
 	{
 		return std::unique_ptr<SDL_Palette>(SDL_AllocPalette(ncolors));
 	}
 
-	std::shared_ptr<SDL_RWops> SP_SDL_AllocRW_S(void)
-	{
-		return std::shared_ptr<SDL_RWops> (SDL_AllocRW());
-	}
-
-	std::unique_ptr<SDL_RWops> SP_SDL_AllocRW_U(void)
+	std::unique_ptr<SDL_RWops> SP_SDL_AllocRW(void)
 	{
 		return std::unique_ptr<SDL_RWops>(SDL_AllocRW());
 	}

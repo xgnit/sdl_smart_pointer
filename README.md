@@ -6,11 +6,8 @@ Manual:
 
 1. The order of the APIs are the same as listed in: https://wiki.libsdl.org/CategoryAPI
 
-2. For each API function an unique ptr and a shared ptr version should be available, unless it's not possible, e.g. void* can only be written in shared ptr.
+2. All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer)
 
-3. All APIs will have the same name of its wrapped brother in SDL, with a prefix of "SP"(smart pointer) or a possible suffix of "_U" (unique ptr) or "_S" (shared ptr). If no suffix, there is only the shared ptr version.
+3. If the original function returns a raw pointer, it will return a unique ptr in this lib
 
-Examples:
-SDL_AddEventWatch -> SP_SDL_AddEventWatch
-SDL_AllocFormat -> SP_SDL_AllocFormat_U
-SDL_AllocFormat -> SP_SDL_AllocFormat_S
+4. If the original function revceives raw pointer, its wrapper should be able to receive shared and unique ptr. With only exception of  void* will be only wrapped with std::shared<void>
