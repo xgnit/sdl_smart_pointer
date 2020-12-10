@@ -35,6 +35,7 @@ License
 
 
 #include <SDL.h>
+#include <SDL_system.h>
 #include <memory>
 #include <string>
 
@@ -106,8 +107,24 @@ namespace SDL_SmartPointer
 	{
 		return std::unique_ptr<SDL_RWops>(SDL_AllocRW());
 	}
+	
+	/*
+	SDL_AndroidGetActivity
+	SDL_AndroidGetExternalStoragePath
+	SDL_AndroidGetExternalStorageState
+	SDL_AndroidGetInternalStoragePath
+	SDL_AndroidGetJNIEnv
+	*/
 
+	int SP_SDL_AtomicAdd_U(std::unique_ptr<SDL_atomic_t>& a, int v)
+	{
+		return SDL_AtomicAdd(a.get(), v);
+	}
 
+	int SP_SDL_AtomicAdd_S(std::shared_ptr<SDL_atomic_t> a, int v)
+	{
+		return SDL_AtomicAdd(a.get(), v);
+	}
 
 
 	/*
