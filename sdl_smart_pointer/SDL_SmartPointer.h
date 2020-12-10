@@ -35,7 +35,6 @@ License
 
 
 #include <SDL.h>
-#include <SDL_system.h>
 #include <memory>
 #include <string>
 
